@@ -1,0 +1,276 @@
+<html>
+<!--
+ index.html
+ author daniel boehringer 2016.  All rights reserved.
+ capp-part based on FastStartLogin Created by Cann on February 17, 2011. Copyright 2011, Cann All rights reserved.
+ bootstrap part based on http://bootsnipp.com/snippets/d36Re
+-->
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+
+        <title> Login </title>
+        <script src="Frameworks/Cup/Resources/js/jquery.min.js" type="text/javascript" charset="UTF-8"></script>
+        <script src="Frameworks/Cup/Resources/js/vendor/jquery.ui.widget.js" type="text/javascript" charset="UTF-8"></script>
+        <script src="Frameworks/Cup/Resources/js/jquery.iframe-transport.js" type="text/javascript" charset="UTF-8"></script>
+        <script src="Frameworks/Cup/Resources/js/jquery.fileupload.js" type="text/javascript" charset="UTF-8"></script>
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+        <script src="/js/bootstrap.min.js"></script> 
+		<script type="text/javascript" src="Frameworks/Objective-J/Objective-J.js" charset="UTF-8"></script>
+
+        <script type="text/javascript">
+            OBJJ_MAIN_FILE = "main.j";
+            OBJJ_COMPILER_FLAGS = ["IncludeDebugSymbols", "IncludeTypeSignatures", "InlineMsgSend"]; 
+
+            OBJJ_DEFER_START = true;
+            var didAuthenticate = false;
+            var didFinishLoading = false;
+            var current_percent = 0;
+
+            OBJJ_PROGRESS_CALLBACK = function(percent) {
+                percent = percent? percent: (++current_percent);
+                percent *= 100;
+                $("#progressBarPill").css('width', percent +'%').attr('aria-valuenow', percent);    
+            }
+
+            OBJJ_DID_FINISH_LOADING = function () {
+                // this is called when progress == 100%, since OBJJ_PROGRESS_CALLBACK doesn't seem to get called for 100%
+                OBJJ_PROGRESS_CALLBACK(1);
+                didFinishLoading = true;
+                $("#progressContainer").hide();
+                start();
+            }
+
+            function start() {
+                if ( typeof CPApplicationMain === "function" && didAuthenticate && didFinishLoading) {
+                    document.body.style.background = "#FFF";
+                    document.body.innerHTML = "";
+                    CPApplicationMain();
+                } else {
+                    OBJJ_DEFER_START = false;
+                }
+            }
+
+            function checkReturn(e) {
+                if (e && e.keyCode == 13){
+                    submitForm();
+               }
+            }
+            function submitForm() {
+                var submit = $("#login-submit");
+                submit.disabled = true;
+                $(submit).attr('value', '...');
+                $(submit).fadeTo("fast" , 0.5);
+                window.G_USERNAME= document.getElementById("username").value.toLowerCase();
+                $.ajax({url: "/AUTH?u="+escape(window.G_USERNAME)+"&p="+escape(document.getElementById("password").value), type : 'GET' } ).done(function(data)
+                {
+                    if(data)
+                    {   window.G_SESSION = data;
+                        didAuthenticate = true;
+                        start();
+                    } else
+                    {   submit.disabled = false;
+                        $(submit).attr('value', 'Falsch?!');
+                        $(submit).fadeTo("fast" , 1);
+                        setTimeout(function(){ $(submit).attr('value', 'Log In') }, 600);
+                    }
+                }); 
+            }
+
+            $(document).ready(function() {
+				$('#login-form-link').click(function(e) {
+					$("#login-form").delay(100).fadeIn(100);
+					$("#register-form").fadeOut(100);
+					$('#register-form-link').removeClass('active');
+					$(this).addClass('active');
+					e.preventDefault();
+				});
+				$('#register-form-link').click(function(e) {
+					$("#register-form").delay(100).fadeIn(100);
+					$("#login-form").fadeOut(100);
+					$('#login-form-link').removeClass('active');
+					$(this).addClass('active');
+					e.preventDefault();
+				});
+
+				$("#username").focus();
+        });
+
+
+        </script>
+
+		<style type = "text/css">
+			body {
+				padding-top: 90px;
+			}
+			.panel-login {
+				border-color: #ccc;
+				-webkit-box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.2);
+				-moz-box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.2);
+				box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.2);
+			}
+			.panel-login>.panel-heading {
+				color: #00415d;
+				background-color: #fff;
+				border-color: #fff;
+				text-align:center;
+			}
+			.panel-login>.panel-heading a{
+				text-decoration: none;
+				color: #666;
+				font-weight: bold;
+				font-size: 15px;
+				-webkit-transition: all 0.1s linear;
+				-moz-transition: all 0.1s linear;
+				transition: all 0.1s linear;
+			}
+			.panel-login>.panel-heading a.active{
+				color: #029f5b;
+				font-size: 18px;
+			}
+			.panel-login>.panel-heading hr{
+				margin-top: 10px;
+				margin-bottom: 0px;
+				clear: both;
+				border: 0;
+				height: 1px;
+				background-image: -webkit-linear-gradient(left,rgba(0, 0, 0, 0),rgba(0, 0, 0, 0.15),rgba(0, 0, 0, 0));
+				background-image: -moz-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.15),rgba(0,0,0,0));
+				background-image: -ms-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.15),rgba(0,0,0,0));
+				background-image: -o-linear-gradient(left,rgba(0,0,0,0),rgba(0,0,0,0.15),rgba(0,0,0,0));
+			}
+			.panel-login input[type="text"],.panel-login input[type="email"],.panel-login input[type="password"] {
+				height: 45px;
+				border: 1px solid #ddd;
+				font-size: 16px;
+				-webkit-transition: all 0.1s linear;
+				-moz-transition: all 0.1s linear;
+				transition: all 0.1s linear;
+			}
+			.panel-login input:hover,
+			.panel-login input:focus {
+				outline:none;
+				-webkit-box-shadow: none;
+				-moz-box-shadow: none;
+				box-shadow: none;
+				border-color: #ccc;
+			}
+			.btn-login {
+				background-color: #59B2E0;
+				outline: none;
+				color: #fff;
+				font-size: 14px;
+				height: auto;
+				font-weight: normal;
+				padding: 14px 0;
+				text-transform: uppercase;
+				border-color: #59B2E6;
+			}
+			.btn-login:hover,
+			.btn-login:focus {
+				color: #fff;
+				background-color: #53A3CD;
+				border-color: #53A3CD;
+			}
+			.forgot-password {
+				text-decoration: underline;
+				color: #888;
+			}
+			.forgot-password:hover,
+			.forgot-password:focus {
+				text-decoration: underline;
+				color: #666;
+			}
+
+			.btn-register {
+				background-color: #1CB94E;
+				outline: none;
+				color: #fff;
+				font-size: 14px;
+				height: auto;
+				font-weight: normal;
+				padding: 14px 0;
+				text-transform: uppercase;
+				border-color: #1CB94A;
+			}
+			.btn-register:hover,
+			.btn-register:focus {
+				color: #fff;
+				background-color: #1CA347;
+				border-color: #1CA347;
+			}
+        </style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="panel panel-login">
+						<div class="panel-heading">
+							<div class="row">
+								<div class="col-xs-6">
+									<a href="#" class="active" id="login-form-link">Login</a>
+								</div>
+								<div class="col-xs-6">
+									<a href="#" id="register-form-link">Register</a>
+								</div>
+							</div>
+							<hr>
+						</div>
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-lg-12">
+									<div id="login-form" role="form" style="display: block;">
+										<div class="form-group">
+											<input type="text" name="username" id="username" tabindex="1" class="form-control" placeholder="Username" value="">
+										</div>
+										<div class="form-group">
+											<input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password" onKeyUp='checkReturn(event)'>
+										</div>
+										<div class="form-group">
+											<div class="row">
+												<div class="col-sm-6 col-sm-offset-3">
+													<input id="login-submit" tabindex="4" class="form-control btn btn-login" value="Log In" onclick="submitForm()">
+												</div>
+											</div>
+										</div>
+									</div>
+									<div id="register-form" onsubmit="registerForm" role="form" style="display: none;">
+										<div class="form-group">
+											<input type="text" name="username" id="username" tabindex="1" class="form-control" placeholder="Username" value="">
+										</div>
+										<div class="form-group">
+											<input type="email" name="email" id="email" tabindex="1" class="form-control" placeholder="Email Address" value="">
+										</div>
+										<div class="form-group">
+											<input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password">
+										</div>
+										<div class="form-group">
+											<input type="password" name="confirm-password" id="confirm-password" tabindex="2" class="form-control" placeholder="Confirm Password">
+										</div>
+										<div class="form-group">
+											<div class="row">
+												<div class="col-sm-6 col-sm-offset-3">
+													<input type="submit" name="register-submit" id="register-submit" tabindex="4" class="form-control btn btn-register" value="Register Now">
+												</div>
+											</div>
+										</div>
+									</div>
+									<div id="progressContainer">
+										<div class="progress">
+										  <div class="progress-bar" id="progressBarPill" role="progressbar" aria-valuenow="0"
+										  aria-valuemin="0" aria-valuemax="100" style="width:0%">
+											<span class="sr-only"></span>
+										  </div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+    </body>
+</html>

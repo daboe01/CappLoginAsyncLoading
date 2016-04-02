@@ -1,0 +1,207 @@
+<html>
+<!--
+ index.html with background loading of the frameworks whilst the user can login
+ author daniel boehringer 2016.  All rights reserved.
+ capp-part based on FastStartLogin Created by Cann on February 17, 2011. Copyright 2011, Cann All rights reserved.
+ bootstrap part based on http://bootsnipp.com/snippets/d36Re
+-->
+    <head>
+        <meta charset="utf-8">
+
+        <!--[if lte IE 8]>
+        <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7, chrome=1">
+        <![endif]-->
+        <!--[if gte IE 9]>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+        <![endif]-->
+
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+        <title> Login </title>
+        <script src="Frameworks/Cup/Resources/js/jquery.min.js" type="text/javascript" charset="UTF-8"></script>
+        <script src="Frameworks/Cup/Resources/js/vendor/jquery.ui.widget.js" type="text/javascript" charset="UTF-8"></script>
+        <script src="Frameworks/Cup/Resources/js/jquery.iframe-transport.js" type="text/javascript" charset="UTF-8"></script>
+        <script src="Frameworks/Cup/Resources/js/jquery.fileupload.js" type="text/javascript" charset="UTF-8"></script>
+        <link rel="stylesheet" href="/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+        <script src="/js/bootstrap.min.js"></script> 
+		<script type="text/javascript" src="Frameworks/Objective-J/Objective-J.js" charset="UTF-8"></script>
+
+        <script type="text/javascript">
+            OBJJ_MAIN_FILE = "main.j";
+            OBJJ_COMPILER_FLAGS = ["IncludeDebugSymbols", "IncludeTypeSignatures", "InlineMsgSend"]; 
+
+            OBJJ_DEFER_START = true;
+            var didAuthenticate = false;
+            var didFinishLoading = false;
+            var current_percent = 0;
+
+            OBJJ_PROGRESS_CALLBACK = function(percent) {
+                percent = percent? percent: (++current_percent);
+                percent *= 100;
+                $("#progressBarPill").css('width', percent +'%').attr('aria-valuenow', percent);    
+            }
+
+            OBJJ_DID_FINISH_LOADING = function () {
+                // this is called when progress == 100%, since OBJJ_PROGRESS_CALLBACK doesn't seem to get called for 100%
+                OBJJ_PROGRESS_CALLBACK(1);
+                didFinishLoading = true;
+                setTimeout(function() {$("#progressContainer").fadeTo("slow", 0.0);}, 1000);
+                start();
+            }
+
+            function start() {
+                if (typeof CPApplicationMain === "function" && didAuthenticate && didFinishLoading) {
+                    document.body.style.background = "#FFF";
+                    document.body.innerHTML = "";
+                    CPApplicationMain();
+                } else {
+                    OBJJ_DEFER_START = false;
+                }
+            }
+
+            function checkReturn(e) {
+                if (e && e.keyCode == 13){
+                    submitForm();
+               }
+            }
+            function submitForm() {
+                var submit = $("#login-submit");
+                submit.disabled = true;
+                $(submit).fadeTo("fast" , 0.5);
+                window.G_USERNAME= document.getElementById("username").value.toLowerCase();
+                $.ajax({url: "/AUTH?u="+escape(window.G_USERNAME)+"&p="+escape(document.getElementById("password").value), type : 'GET' } ).done(function(data)
+                {
+                    if(data)
+                    {   window.G_SESSION = data;
+                        didAuthenticate = true;
+                        start();
+                    } else
+                    {   submit.disabled = false;
+                        $(submit).text('Falsch?!');
+                        $(submit).fadeTo("fast" , 1);
+                        setTimeout(function(){ $(submit).text('Log In') }, 600);
+                    }
+                }); 
+            }
+
+            $(document).ready(function() {
+                setTimeout(function() {$("#progressContainer").fadeTo("fast", 1.0);}, 1000);
+				$("#username").focus();
+        });
+
+
+        </script>
+
+		<style type = "text/css">
+			body {
+				padding-top: 190px;
+			}
+			.panel-login {
+                background-image: url("Resources/logo.png");
+                background-repeat: no-repeat;
+                background-position: center top;
+				padding-top: 55px;
+				border-color: #ccc;
+				-webkit-box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.2);
+				-moz-box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.2);
+				box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.2);
+			}
+			.panel-login>.panel-heading {
+				color: #00415d;
+				background-color: #fff;
+				border-color: #fff;
+				text-align:center;
+			}
+			.panel-login>.panel-heading a{
+				text-decoration: none;
+				color: #666;
+				font-weight: bold;
+				font-size: 15px;
+				-webkit-transition: all 0.1s linear;
+				-moz-transition: all 0.1s linear;
+				transition: all 0.1s linear;
+			}
+			.panel-login>.panel-heading a.active{
+				color: #029f5b;
+				font-size: 18px;
+			}
+			.panel-login input[type="text"],.panel-login input[type="email"],.panel-login input[type="password"] {
+				height: 45px;
+				border: 1px solid #ddd;
+				font-size: 16px;
+				-webkit-transition: all 0.1s linear;
+				-moz-transition: all 0.1s linear;
+				transition: all 0.1s linear;
+			}
+			.panel-login input:hover,
+			.panel-login input:focus {
+				outline:none;
+				border-color: #ccc;
+			}
+			.btn-login {
+				background-color: #59B2E0;
+				outline: none;
+				color: #fff;
+				font-size: 14px;
+				height: auto;
+				font-weight: normal;
+				padding: 14px 0;
+				text-transform: uppercase;
+				border-color: #59B2E6;
+			}
+			.btn-login:hover,
+			.btn-login:focus {
+				color: #fff;
+				outline:none;
+				-webkit-box-shadow: none;
+				-moz-box-shadow: none;
+				box-shadow: none;
+				background-color: #53A3CD;
+				border-color: #53A3CD;
+			}
+        </style>
+	</head>
+	<body style="background-image: url(Resources/background.jpg)">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<div class="panel panel-login">
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-lg-12">
+									<div id="login-form" role="form" style="display: block;">
+										<div class="form-group">
+											<input type="text" name="username" id="username" tabindex="1" class="form-control" placeholder="Username" value="">
+										</div>
+										<div class="form-group">
+											<input type="password" name="password" id="password" tabindex="2" class="form-control" placeholder="Password" onKeyUp='checkReturn(event)'>
+										</div>
+										<div class="control-group">
+											<div class="row">
+												<div class="col-sm-6 col-sm-offset-3">
+													<div id="login-submit" tabindex="4" class="form-control btn btn-login" onclick="submitForm()">Log In</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+            <div id="progressContainer" class="row" style="opacity: 0.0">
+                <div class="progress">
+	                <div class="progress-bar" id="progressBarPill" role="progressbar" aria-valuenow="0"
+					     aria-valuemin="0" aria-valuemax="100" style="width:0%">
+					     <span class="sr-only"></span>
+					</div>
+                </div>
+             </div>
+		</div>
+    </body>
+</html>
