@@ -30,7 +30,7 @@ get '/AUTH' => sub {
     my $user= $self->param('u');
     my $pass= $self->param('p');
     my $sessionid='';
-    if(0&& $user)
+    if($user)
     {   if($self->LDAPChallenge($user,$pass))
         {   my  %session;
             tie %session, 'Apache::Session::File', undef , {Transaction => 0};

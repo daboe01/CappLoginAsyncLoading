@@ -55,9 +55,15 @@
 
             function start() {
                 if (typeof CPApplicationMain === "function" && didAuthenticate && didFinishLoading) {
-                    document.body.style.background = "#FFF";
-                    document.body.innerHTML = "";
-                    CPApplicationMain();
+                    var div = document.createElement("div");
+                    div.classList.add("fadeMe");
+                    $(document.body).append(div);
+                    $(div).fadeTo("fast", 1, function(){
+                        $(div).remove();
+                        document.body.style.backgroundImage="";
+                        document.body.innerHTML = "";
+                        CPApplicationMain();
+                    })
                 } else {
                     OBJJ_DEFER_START = false;
                 }
@@ -83,7 +89,7 @@
                     {   submit.disabled = false;
                         $(submit).text('Falsch?!');
                         $(submit).fadeTo("fast" , 1);
-                        setTimeout(function(){ $(submit).text('Log In') }, 600);
+                        setTimeout(function(){ $(submit).text('Log In') }, 800);
                     }
                 }); 
             }
@@ -163,6 +169,17 @@
 				background-color: #53A3CD;
 				border-color: #53A3CD;
 			}
+            div.fadeMe {
+                opacity:    0; 
+                background: #FFF; 
+                width:      100%;
+                height:     100%; 
+                z-index:    10;
+                top:        0; 
+                left:       0; 
+                position:   fixed; 
+           }
+
         </style>
 	</head>
 	<body style="background-image: url(Resources/background.jpg)">
