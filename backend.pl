@@ -13,14 +13,15 @@ $ENV{MOJO_MAX_MESSAGE_SIZE} = 1_073_741_824;
 plugin 'database', { 
             dsn      => 'dbi:Pg:dbname=aug_clinical;user=root;host=localhost',
             username => 'root',
-            password => 'root',
             options  => { 'pg_enable_utf8' => 1, AutoCommit => 1 },
             helper   => 'db'
 };
 
 helper LDAPChallenge => sub { my ($self, $name, $password)=@_;
+
 return 1;
-    my $ldap = Net::LDAP->new( 'ldap://ldap.ukl.uni-freiburg.de' );
+
+    my $ldap = Net::LDAP->new( 'ldap://ldap.xxx.de' );
     my $msg = $ldap->bind( 'uid='.$name.', ou=people, dc=ukl, dc=uni-freiburg, dc=de', password => $password);
     return $msg->code==0;
 };
