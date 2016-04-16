@@ -15,6 +15,21 @@
 
 - (void)applicationDidFinishLaunching:(CPNotification)aNotification
 {
+    var div = document.createElement("div");
+    div.style.opacity = 1;
+    div.style.background = "#FFF";
+    div.style.width = "100%";
+    div.style.height = "100%";
+    div.style.zIndex = 10000;
+    div.style.top="0px"
+    div.style.left="0px"
+    div.style.position="fixed";
+    div.classList.add("cpdontremove");
+    $(document.body).append(div);
+    $(div).fadeTo(2000, 0, function(){
+       $(div).remove();
+    })
+
     var theWindow = [[CPWindow alloc] initWithContentRect:CGRectMakeZero() styleMask:CPBorderlessBridgeWindowMask],
         contentView = [theWindow contentView];
 
@@ -31,9 +46,6 @@
     [contentView addSubview:label];
 
     [theWindow orderFront:self];
-
-    // Uncomment the following line to turn on the standard menu bar.
-    //[CPMenu setMenuBarVisible:YES];
 }
 
 @end
